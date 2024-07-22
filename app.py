@@ -6,7 +6,6 @@ app = Flask(__name__)
 # CORS(app)
 CORS(app, resources={r"/*": {"origins": "https://bot-frontend-psi.vercel.app/"}})  # Allow CORS for all origins on all routes
 
-logging.basicConfig(level=logging.DEBUG)
 
 genai.configure(api_key="AIzaSyAmPpGYto4N9vJrSpMJklZN_tNI0UJmTzo")  
 
