@@ -3,7 +3,10 @@ from flask_cors import CORS
 import google.generativeai as genai
 
 app = Flask(__name__)
-CORS(app)
+# CORS(app)
+CORS(app, resources={r"/*": {"origins": "https://bot-frontend-psi.vercel.app/"}})  # Allow CORS for all origins on all routes
+
+logging.basicConfig(level=logging.DEBUG)
 
 genai.configure(api_key="AIzaSyAmPpGYto4N9vJrSpMJklZN_tNI0UJmTzo")  
 
@@ -22,6 +25,15 @@ model = genai.GenerativeModel(
 
 @app.route('/ask', methods=['POST'])
 def ask_gemini():
+
+    if request.method == 'OPTIONS':
+        headers = {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'POST',
+        'Access-Control-Allow-Headers': 'Content-Type'
+    }
+        return '', 200, headers
+
     data = request.get_json()
     prompt = data.get('prompt', '')
 
