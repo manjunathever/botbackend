@@ -3,9 +3,7 @@ from flask_cors import CORS
 import google.generativeai as genai
 
 app = Flask(__name__)
-# CORS(app)
-CORS(app, resources={r"/*": {"origins": "https://bot-frontend-psi.vercel.app/"}})  # Allow CORS for all origins on all routes
-
+CORS(app, resources={r"/*": {"origins": "https://bot-frontend-psi.vercel.app"}})  # Allow CORS for the specified origin
 
 genai.configure(api_key="AIzaSyAmPpGYto4N9vJrSpMJklZN_tNI0UJmTzo")  
 
@@ -22,15 +20,15 @@ model = genai.GenerativeModel(
     generation_config=generation_config,
 )
 
-@app.route('/ask', methods=['POST'])
+@app.route('/ask', methods=['POST', 'OPTIONS'])
 def ask_gemini():
 
     if request.method == 'OPTIONS':
         headers = {
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Methods': 'POST',
-        'Access-Control-Allow-Headers': 'Content-Type'
-    }
+            'Access-Control-Allow-Origin': 'https://bot-frontend-psi.vercel.app',
+            'Access-Control-Allow-Methods': 'POST',
+            'Access-Control-Allow-Headers': 'Content-Type'
+        }
         return '', 200, headers
 
     data = request.get_json()
@@ -43,11 +41,10 @@ def ask_gemini():
         chat_session = model.start_chat(history=[])
         response = chat_session.send_message(prompt)
         answer = response.text.strip()
-        return jsonify({'answer': answer})
+        return jsonify({'answer': answer}), 200, {'Access-Control-Allow-Origin': 'https://bot-frontend-psi.vercel.app'}
     except Exception as e:
         app.logger.error(f"Error: {e}")
-        return jsonify({'error': str(e)}), 500
+        return jsonify({'error': str(e)}), 500, {'Access-Control-Allow-Origin': 'https://bot-frontend-psi.vercel.app'}
     
 if __name__ == '__main__':
     app.run(debug=True)
-
